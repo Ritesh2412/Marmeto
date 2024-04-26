@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marnieto Embrace Sideboard</title>
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <!-- Header content goes here -->
+  </header>
+  <nav>
+    <!-- Navigation content goes here -->
+  </nav>
+  <main>
+    <div class="product-container">
+      <div class="product-image">
+        <!-- Image will be added dynamically -->
+        <img id="product-image" alt="Marnieto Embrace Sideboard.">
+      </div>
+      <div class="product-info">
+        <h2 id="product-title"></h2>
+        <p class="price">
+          <span class="original-price" id="original-price"></span>
+          <span class="sale-price" id="sale-price"></span>
+        </p>
+        <div class="quantity-selector">
+          <label for="quantity">Quantity:</label>
+          <input type="number" id="quantity" value="1" min="1">
+        </div>
+        <div class="size-options">
+          <h3>Choose a Size</h3>
+          <div id="size-options"></div>
+        </div>
+        <div class="color-options">
+          <h3>Choose a Color</h3>
+          <div id="color-options"></div>
+        </div>
+        <button class="add-to-cart">Add To Cart</button>
+        <p class="description" id="product-description"></p>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <!-- Footer content goes here -->
+  </footer>
+
+  <script>
+    fetch('https://cdn.shopify.com/s/files/1/0564/3685/0790/files/singleProduct.json?v=1701948448')
+      .then(response => response.json())
+      .then(data => {
+        const product = data.product;
+        document.getElementById('product-title').innerText = product.title;
+        document.getElementById('original-price').innerText = product.compare_at_price;
+        document.getElementById('sale-price').innerText = product.price;
+        document.getElementById('product-description').innerHTML = product.description;
+        
+        const sizeOptions = document.getElementById('size-options');
+        product.options.find(option => option.name === 'Size').values.forEach(size => {
+          const radio = document.createElement('input');
+          radio.type = 'radio';
+          radio.name = 'size';
+          radio.value = size;
+          radio.id = size.toLowerCase(); // Use lowercase size as ID
+          const label = document.createElement('label');
+          label.htmlFor = size.toLowerCase(); // Use lowercase size as ID
+          label.textContent = size;
+          sizeOptions.appendChild(radio);
+          sizeOptions.appendChild(label);
+        });
+
+        const colorOptions = document.getElementById('color-options');
+        product.options.find(option => option.name === 'Color').values.forEach(color => {
+          const radio = document.createElement('input');
+          radio.type = 'radio';
+          radio.name = 'color';
+          radio.value = Object.keys(color)[0]; // Assuming color object has only one key
+          radio.id = radio.value.toLowerCase(); // Use lowercase color name as ID
+          const label = document.createElement('label');
+          label.htmlFor = radio.value.toLowerCase(); // Use lowercase color name as ID
+          label.textContent = Object.keys(color)[0]; // Assuming color object has only one key
+          colorOptions.appendChild(radio);
+          colorOptions.appendChild(label);
+        });
+
+        // Dynamically set the image source using absolute URLs
+        const productImage = document.getElementById('product-image');
+        productImage.src = product.images[0].src; // Assuming the first image is the main product image
+        productImage.alt = product.title;
+
+        // Function to handle adding the product to the cart
+        function addToCart() {
+          const selectedSize = document.querySelector('input[name="size"]:checked');
+          const selectedColor = document.querySelector('input[name="color"]:checked');
+          const quantity = document.getElementById('quantity').value;
+          if (selectedSize && selectedColor) {
+            const productToAdd = {
+              title: product.title,
+              size: selectedSize.value,
+              color: selectedColor.value,
+              quantity: quantity
+            };
+            // Example: Add product to cart logic (replace with your own implementation)
+            console.log('Added to cart:', productToAdd);
+            alert('Product added to cart!');
+          } else {
+            alert('Please select a size and a color.');
+          }
+        }
+
+        // Attach event listener to Add To Cart button
+        document.querySelector('.add-to-cart').addEventListener('click', addToCart);
+      })
+      .catch(error => console.error('Error fetching JSON:', error));
+  </script>
+</body>
+</html>
